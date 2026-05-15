@@ -18,7 +18,7 @@ export interface AuthState {
   logout: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   isAuthenticated: false,
   isLoading: true,
@@ -26,7 +26,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   setUser: (user: User | null) => {
     set({ user, isAuthenticated: user !== null });
   },
-  
+
   logout: async () => {
     try {
       const { logOut } = await import('@/services/firebaseAuth');
@@ -46,23 +46,19 @@ export const useAuthStore = create<AuthState>((set) => ({
           resolve();
         }, 2000);
 
-        // Listen to Supabase auth state changes
         const { data: authListener } = supabase.auth.onAuthStateChange(
           async (event, session) => {
             clearTimeout(timeout);
             
             if (session?.user) {
-              // User is signed in
               set({ isLoading: false, isAuthenticated: true });
             } else {
-              // User is signed out
               set({ user: null, isAuthenticated: false, isLoading: false });
             }
             resolve();
           }
         );
 
-        // Cleanup subscription
         return () => {
           authListener?.subscription?.unsubscribe();
         };

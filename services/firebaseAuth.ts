@@ -117,6 +117,47 @@ export const updateUserProfile = async (
   }
 };
 
+// Update user name
+export const updateUserName = async (uid: string, name: string): Promise<void> => {
+  try {
+    const { error: authError } = await supabase.auth.updateUser({
+      data: { name },
+    });
+
+    if (authError) throw authError;
+
+    const { error: dbError } = await supabase
+      .from('users')
+      .update({ name })
+      .eq('id', uid);
+
+    if (dbError) throw dbError;
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
+
+// Change password
+export const changePassword = async (newPassword: string): Promise<void> => {
+  try {
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (error) {
+      console.error('Password change error:', error);
+      throw error;
+    }
+
+    if (!data.user) {
+      throw new Error('Failed to update password');
+    }
+  } catch (error: any) {
+    console.error('Change password exception:', error);
+    throw new Error(error.message || 'Failed to change password');
+  }
+};
+
 // Check if user is admin
 export const isUserAdmin = (email: string): boolean => {
   return adminEmails.includes(email);

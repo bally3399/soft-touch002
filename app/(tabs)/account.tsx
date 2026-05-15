@@ -15,6 +15,7 @@ const LANGUAGES = [
 
 export default function AccountScreen() {
   const user = useAuthStore((state) => state.user);
+  const setUser = useAuthStore((state) => state.setUser);
   const logout = useAuthStore((state) => state.logout);
   const { language, setLanguage } = useLanguageStore();
   const router = useRouter();
@@ -25,6 +26,10 @@ export default function AccountScreen() {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleLogout = () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
@@ -39,16 +44,33 @@ export default function AccountScreen() {
     ]);
   };
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
     if (!editedName.trim()) {
       Alert.alert('Error', 'Name cannot be empty');
       return;
     }
-    Alert.alert('Success', 'Profile updated successfully');
-    setIsEditing(false);
+
+    setIsLoading(true);
+    try {
+      if (!user) throw new Error('No user logged in');
+      
+      const module = await import('@/services/firebaseAuth');
+      if (!module.updateUserName) {
+        throw new Error('updateUserName function not found in module');
+      }
+      await module.updateUserName(user.id, editedName);
+      setUser({ ...user, name: editedName });
+      Alert.alert('Success', 'Profile updated successfully');
+      setIsEditing(false);
+    } catch (error: any) {
+      console.error('Profile update error:', error);
+      Alert.alert('Error', error.message || 'Failed to update profile');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     if (!oldPassword.trim() || !newPassword.trim() || !confirmPassword.trim()) {
       Alert.alert('Error', 'Please fill in all password fields');
       return;
@@ -64,11 +86,24 @@ export default function AccountScreen() {
       return;
     }
 
-    Alert.alert('Success', 'Password changed successfully');
-    setShowPasswordChange(false);
-    setOldPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
+    setIsLoading(true);
+    try {
+      const module = await import('@/services/firebaseAuth');
+      if (!module.changePassword) {
+        throw new Error('changePassword function not found in module');
+      }
+      await module.changePassword(newPassword);
+      Alert.alert('Success', 'Password updated successfully');
+      setShowPasswordChange(false);
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error: any) {
+      console.error('Password change error:', error);
+      Alert.alert('Error', error.message || 'Failed to change password');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleChangeLanguage = (newLanguage: Language) => {
@@ -132,8 +167,8 @@ export default function AccountScreen() {
               />
             </View>
 
-            <Pressable style={styles.saveButton} onPress={handleSaveProfile}>
-              <Text style={styles.saveButtonText}>Save Changes</Text>
+            <Pressable style={[styles.saveButton, isLoading && styles.buttonDisabled]} onPress={handleSaveProfile} disabled={isLoading}>
+              <Text style={styles.saveButtonText}>{isLoading ? 'Saving...' : 'Save Changes'}</Text>
             </Pressable>
           </View>
         ) : (
@@ -206,45 +241,82 @@ export default function AccountScreen() {
           <View style={styles.editForm}>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Current Password</Text>
-              <TextInput
-                style={styles.input}
-                value={oldPassword}
-                onChangeText={setOldPassword}
-                secureTextEntry
-                placeholderTextColor="#666666"
-                placeholder="Enter current password"
-              />
+              <View style={styles.passwordInputContainer}>
+                <TextInput
+                  style={styles.passwordInput}
+                  value={oldPassword}
+                  onChangeText={setOldPassword}
+                  secureTextEntry={!showOldPassword}
+                  placeholderTextColor="#666666"
+                  placeholder="Enter current password"
+                />
+                <Pressable
+                  style={styles.eyeIcon}
+                  onPress={() => setShowOldPassword(!showOldPassword)}
+                >
+                  <Ionicons
+                    name={showOldPassword ? 'eye' : 'eye-off'}
+                    size={20}
+                    color="#AAAAAA"
+                  />
+                </Pressable>
+              </View>
             </View>
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>New Password</Text>
-              <TextInput
-                style={styles.input}
-                value={newPassword}
-                onChangeText={setNewPassword}
-                secureTextEntry
-                placeholderTextColor="#666666"
-                placeholder="Enter new password"
-              />
+              <View style={styles.passwordInputContainer}>
+                <TextInput
+                  style={styles.passwordInput}
+                  value={newPassword}
+                  onChangeText={setNewPassword}
+                  secureTextEntry={!showNewPassword}
+                  placeholderTextColor="#666666"
+                  placeholder="Enter new password"
+                />
+                <Pressable
+                  style={styles.eyeIcon}
+                  onPress={() => setShowNewPassword(!showNewPassword)}
+                >
+                  <Ionicons
+                    name={showNewPassword ? 'eye' : 'eye-off'}
+                    size={20}
+                    color="#AAAAAA"
+                  />
+                </Pressable>
+              </View>
             </View>
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Confirm Password</Text>
-              <TextInput
-                style={styles.input}
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry
-                placeholderTextColor="#666666"
-                placeholder="Confirm new password"
-              />
+              <View style={styles.passwordInputContainer}>
+                <TextInput
+                  style={styles.passwordInput}
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  secureTextEntry={!showConfirmPassword}
+                  placeholderTextColor="#666666"
+                  placeholder="Confirm new password"
+                />
+                <Pressable
+                  style={styles.eyeIcon}
+                  onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  <Ionicons
+                    name={showConfirmPassword ? 'eye' : 'eye-off'}
+                    size={20}
+                    color="#AAAAAA"
+                  />
+                </Pressable>
+              </View>
             </View>
 
             <Pressable
-              style={styles.saveButton}
+              style={[styles.saveButton, isLoading && styles.buttonDisabled]}
               onPress={handleChangePassword}
+              disabled={isLoading}
             >
-              <Text style={styles.saveButtonText}>Update Password</Text>
+              <Text style={styles.saveButtonText}>{isLoading ? 'Updating...' : 'Update Password'}</Text>
             </Pressable>
           </View>
         )}
@@ -401,6 +473,25 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
   },
+  passwordInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#2A2A2A',
+    borderWidth: 1,
+    borderColor: '#333333',
+    borderRadius: 8,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    color: '#FFFFFF',
+    fontSize: 14,
+  },
+  eyeIcon: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
   disabledInput: {
     opacity: 0.6,
   },
@@ -415,6 +506,9 @@ const styles = StyleSheet.create({
     color: '#000000',
     fontSize: 14,
     fontWeight: '600',
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
   languageList: {
     gap: 8,
