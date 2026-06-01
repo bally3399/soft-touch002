@@ -1,0 +1,182 @@
+Soft Touch
+Fashion Catalog
+Discover amazing fashion designs and shop with ease
+Login
+Sign Up
+Select Your Country
+Nigeria
+Select Your Language
+English
+Hausa
+Yoruba
+Igbo
+Create Account
+Join Soft Touch today
+Full Name
+Email
+Password
+Confirm Password
+Sign Up
+Already have an account?
+Login
+Please fill in all fields
+Please enter a valid email
+Password must be at least 6 characters
+Passwords do not match
+Welcome Back
+Login to your account
+Login
+Don't have an account?
+Sign Up
+Forgot Password?
+Reset Password
+Enter your email address and we'll help you reset your password via WhatsApp
+Email Address
+Contact Admin on WhatsApp
+Logging in...
+Invalid email or password
+User not found. Please sign up first
+Invalid password
+Invalid email address
+Too many login attempts. Please try again later
+Could not open WhatsApp. Please make sure WhatsApp is installed
+Home
+New Arrivals
+Featured Design
+Browse Categories
+What Our Customers Say
+Ready to Elevate Your Style?
+Explore Designs
+See All
+Shop Now
+No designs available yet
+Discover our exclusive collection designed for kings
+Cart
+Your cart is empty
+Add some designs to get started
+Total:
+Send Order
+Empty Cart
+Please add items to your cart first
+Opening WhatsApp...
+WhatsApp is not installed on your device. Please install WhatsApp to place orders
+Could not open WhatsApp
+Account
+Profile Information
+Change Password
+Logout
+Language
+Admin Panel
+Upload Designs
+Manage Designs
+Manage Featured
+Admin
+Are you sure you want to logout?
+Name cannot be empty
+Profile updated successfully
+Please fill in all password fields
+New password must be at least 6 characters
+Passwords do not match
+Password updated successfully
+Saving...
+Save Changes
+Updating...
+Update Password
+Current Password
+New Password
+Confirm Password
+Full Name
+Our Designs
+Filter by Category
+All
+Agbada
+English wears
+Nativewear
+Kaftan
+Cap
+Senate wear
+No Designs Found
+No designs in this category yet. Check back soon!
+added to cart!
+removed from wishlist
+added to wishlist
+Add to Cart
+Product Details
+Features
+Premium Quality
+Authentic Design
+Fast Delivery
+Add to Cart
+Buy Now
+ID:
+Price
+Category
+Description
+My Wishlist
+Your Wishlist is Empty
+Add items to your wishlist to save them for later
+added to cart!
+removed from wishlist
+Manage Designs
+Search designs...
+Delete Design
+Are you sure you want to delete
+Design deleted successfully
+Design name cannot be empty
+Please enter a valid price
+Design updated successfully
+No designs yet
+No designs match your search
+Total Designs
+Showing
+Upload New Design
+Add a new design to the catalog
+Category
+Select Category
+Design ID
+Design Name
+e.g. Royal Agbada
+Description
+Enter a description of the design
+Price ($)
+29.99
+Design Image
+Select Image
+Add Design
+Uploading...
+Please select a category
+Please enter a design name
+Please enter a description
+Please enter a price
+Please select an image
+Please enter a valid price
+User not authenticated
+Design uploaded successfully
+Reset Password
+Enter your new password below
+New Password
+Confirm Password
+Enter new password
+Confirm new password
+Reset Password
+Resetting...
+Invalid reset link
+Please fill in all fields
+Password must be at least 6 characters
+Passwords do not match
+Your password has been reset successfully. Please log in with your new password
+Name
+Email
+Save
+Cancel
+Error
+Success
+ID
+Price
+Quantity
+Total
+Remove
+Edit
+Delete
+Loading...
+No data available

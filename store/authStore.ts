@@ -18,7 +18,7 @@ export interface AuthState {
   logout: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
   isLoading: true,
@@ -47,11 +47,23 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         }, 2000);
 
         const { data: authListener } = supabase.auth.onAuthStateChange(
-          async (event, session) => {
+          async (_event, session) => {
             clearTimeout(timeout);
             
             if (session?.user) {
-              set({ isLoading: false, isAuthenticated: true });
+              // Import isUserAdmin to check if user is admin
+              const { isUserAdmin } = await import('@/services/firebaseAuth');
+              
+              set({
+                user: {
+                  id: session.user.id,
+                  email: session.user.email || '',
+                  name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || '',
+                  isAdmin: isUserAdmin(session.user.email || ''),
+                },
+                isLoading: false,
+                isAuthenticated: true,
+              });
             } else {
               set({ user: null, isAuthenticated: false, isLoading: false });
             }

@@ -1,23 +1,17 @@
-import { Language } from '@/locales/translations';
+import { Language, getTranslation } from '@/locales/translations';
+import { changePassword, updateUserName } from '@/services/firebaseAuth';
 import { useAuthStore } from '@/store/authStore';
-import { useLanguageStore } from '@/store/languageStore';
+import { COUNTRY_LANGUAGES, useLanguageStore } from '@/store/languageStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-
-const LANGUAGES = [
-  { code: 'en' as Language, name: 'English', nativeName: 'English' },
-  { code: 'ha' as Language, name: 'Hausa', nativeName: 'Hausa' },
-  { code: 'yo' as Language, name: 'Yoruba', nativeName: 'Yorùbá' },
-  { code: 'ig' as Language, name: 'Igbo', nativeName: 'Igbo' },
-];
 
 export default function AccountScreen() {
   const user = useAuthStore((state) => state.user);
   const setUser = useAuthStore((state) => state.setUser);
   const logout = useAuthStore((state) => state.logout);
-  const { language, setLanguage } = useLanguageStore();
+  const { language, setLanguage, country } = useLanguageStore();
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(user?.name || '');
@@ -31,22 +25,37 @@ export default function AccountScreen() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // Get available languages for the current country
+  const availableLanguages = useMemo(() => {
+    return COUNTRY_LANGUAGES[country] || COUNTRY_LANGUAGES.default;
+  }, [country]);
+
+  // Type-safe country for translations
+  const countryForTranslation = country as any;
+
   const handleLogout = () => {
-    Alert.alert('Logout', 'Are you sure you want to logout?', [
-      { text: 'Cancel', onPress: () => {} },
-      {
-        text: 'Logout',
-        onPress: () => {
-          logout();
-          router.replace('/login');
+    Alert.alert(
+      getTranslation('account.logout', language, countryForTranslation),
+      getTranslation('common.logout', language, countryForTranslation) || 'Are you sure you want to logout?',
+      [
+        { text: getTranslation('common.cancel', language, countryForTranslation), onPress: () => {} },
+        {
+          text: getTranslation('account.logout', language, countryForTranslation),
+          onPress: () => {
+            logout();
+            router.replace('/login');
+          },
         },
-      },
-    ]);
+      ]
+    );
   };
 
   const handleSaveProfile = async () => {
     if (!editedName.trim()) {
-      Alert.alert('Error', 'Name cannot be empty');
+      Alert.alert(
+        getTranslation('common.error', language, countryForTranslation),
+        getTranslation('profile.fillall', language, countryForTranslation) || 'Name cannot be empty'
+      );
       return;
     }
 
@@ -54,17 +63,19 @@ export default function AccountScreen() {
     try {
       if (!user) throw new Error('No user logged in');
       
-      const module = await import('@/services/firebaseAuth');
-      if (!module.updateUserName) {
-        throw new Error('updateUserName function not found in module');
-      }
-      await module.updateUserName(user.id, editedName);
+      await updateUserName(user.id, editedName);
       setUser({ ...user, name: editedName });
-      Alert.alert('Success', 'Profile updated successfully');
+      Alert.alert(
+        getTranslation('common.success', language, countryForTranslation),
+        getTranslation('profile.updated', language, countryForTranslation) || 'Profile updated successfully'
+      );
       setIsEditing(false);
     } catch (error: any) {
       console.error('Profile update error:', error);
-      Alert.alert('Error', error.message || 'Failed to update profile');
+      Alert.alert(
+        getTranslation('common.error', language, countryForTranslation),
+        error.message || getTranslation('profile.error', language, countryForTranslation) || 'Failed to update profile'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -72,35 +83,46 @@ export default function AccountScreen() {
 
   const handleChangePassword = async () => {
     if (!oldPassword.trim() || !newPassword.trim() || !confirmPassword.trim()) {
-      Alert.alert('Error', 'Please fill in all password fields');
+      Alert.alert(
+        getTranslation('common.error', language, countryForTranslation),
+        getTranslation('checkout.fillall', language, countryForTranslation) || 'Please fill in all password fields'
+      );
       return;
     }
 
     if (newPassword.length < 6) {
-      Alert.alert('Error', 'New password must be at least 6 characters');
+      Alert.alert(
+        getTranslation('common.error', language, countryForTranslation),
+        getTranslation('signup.passwordmin', language, countryForTranslation) || 'New password must be at least 6 characters'
+      );
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      Alert.alert(
+        getTranslation('common.error', language, countryForTranslation),
+        getTranslation('signup.passwordmatch', language, countryForTranslation) || 'Passwords do not match'
+      );
       return;
     }
 
     setIsLoading(true);
     try {
-      const module = await import('@/services/firebaseAuth');
-      if (!module.changePassword) {
-        throw new Error('changePassword function not found in module');
-      }
-      await module.changePassword(newPassword);
-      Alert.alert('Success', 'Password updated successfully');
+      await changePassword(newPassword);
+      Alert.alert(
+        getTranslation('common.success', language, countryForTranslation),
+        getTranslation('account.changepassword', language, countryForTranslation) || 'Password updated successfully'
+      );
       setShowPasswordChange(false);
       setOldPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (error: any) {
       console.error('Password change error:', error);
-      Alert.alert('Error', error.message || 'Failed to change password');
+      Alert.alert(
+        getTranslation('common.error', language, countryForTranslation),
+        error.message || 'Failed to change password'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -135,7 +157,7 @@ export default function AccountScreen() {
       {/* Edit Profile Section */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Profile Information</Text>
+          <Text style={styles.sectionTitle}>{getTranslation('profile.title', language, countryForTranslation)}</Text>
           <Pressable onPress={() => setIsEditing(!isEditing)}>
             <Ionicons
               name={isEditing ? 'close' : 'pencil'}
@@ -148,7 +170,7 @@ export default function AccountScreen() {
         {isEditing ? (
           <View style={styles.editForm}>
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Full Name</Text>
+              <Text style={styles.label}>{getTranslation('profile.fullname', language, countryForTranslation)}</Text>
               <TextInput
                 style={styles.input}
                 value={editedName}
@@ -158,7 +180,7 @@ export default function AccountScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Email</Text>
+              <Text style={styles.label}>{getTranslation('profile.email', language, countryForTranslation)}</Text>
               <TextInput
                 style={[styles.input, styles.disabledInput]}
                 value={user?.email}
@@ -168,17 +190,17 @@ export default function AccountScreen() {
             </View>
 
             <Pressable style={[styles.saveButton, isLoading && styles.buttonDisabled]} onPress={handleSaveProfile} disabled={isLoading}>
-              <Text style={styles.saveButtonText}>{isLoading ? 'Saving...' : 'Save Changes'}</Text>
+              <Text style={styles.saveButtonText}>{isLoading ? getTranslation('profile.updating', language, countryForTranslation) : getTranslation('common.save', language, countryForTranslation)}</Text>
             </Pressable>
           </View>
         ) : (
           <View style={styles.infoContainer}>
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Name:</Text>
+              <Text style={styles.infoLabel}>{getTranslation('profile.fullname', language, countryForTranslation)}:</Text>
               <Text style={styles.infoValue}>{user?.name}</Text>
             </View>
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Email:</Text>
+              <Text style={styles.infoLabel}>{getTranslation('profile.email', language, countryForTranslation)}:</Text>
               <Text style={styles.infoValue}>{user?.email}</Text>
             </View>
           </View>
@@ -191,7 +213,7 @@ export default function AccountScreen() {
           style={styles.sectionHeader}
           onPress={() => setShowLanguageSelect(!showLanguageSelect)}
         >
-          <Text style={styles.sectionTitle}>Language</Text>
+          <Text style={styles.sectionTitle}>{getTranslation('account.language', language, countryForTranslation)}</Text>
           <Ionicons
             name={showLanguageSelect ? 'chevron-up' : 'chevron-down'}
             size={20}
@@ -201,7 +223,7 @@ export default function AccountScreen() {
 
         {showLanguageSelect && (
           <View style={styles.languageList}>
-            {LANGUAGES.map((lang) => (
+            {availableLanguages.map((lang) => (
               <Pressable
                 key={lang.code}
                 style={[
@@ -229,7 +251,7 @@ export default function AccountScreen() {
           style={styles.sectionHeader}
           onPress={() => setShowPasswordChange(!showPasswordChange)}
         >
-          <Text style={styles.sectionTitle}>Change Password</Text>
+          <Text style={styles.sectionTitle}>{getTranslation('account.changepassword', language, countryForTranslation)}</Text>
           <Ionicons
             name={showPasswordChange ? 'chevron-up' : 'chevron-down'}
             size={20}
@@ -240,7 +262,7 @@ export default function AccountScreen() {
         {showPasswordChange && (
           <View style={styles.editForm}>
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Current Password</Text>
+              <Text style={styles.label}>{getTranslation('login.emailaddress', language, countryForTranslation)}</Text>
               <View style={styles.passwordInputContainer}>
                 <TextInput
                   style={styles.passwordInput}
@@ -248,7 +270,7 @@ export default function AccountScreen() {
                   onChangeText={setOldPassword}
                   secureTextEntry={!showOldPassword}
                   placeholderTextColor="#666666"
-                  placeholder="Enter current password"
+                  placeholder={getTranslation('login.emailaddress', language, countryForTranslation)}
                 />
                 <Pressable
                   style={styles.eyeIcon}
@@ -264,7 +286,7 @@ export default function AccountScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>New Password</Text>
+              <Text style={styles.label}>{getTranslation('signup.password', language, countryForTranslation)}</Text>
               <View style={styles.passwordInputContainer}>
                 <TextInput
                   style={styles.passwordInput}
@@ -272,7 +294,7 @@ export default function AccountScreen() {
                   onChangeText={setNewPassword}
                   secureTextEntry={!showNewPassword}
                   placeholderTextColor="#666666"
-                  placeholder="Enter new password"
+                  placeholder={getTranslation('signup.password', language, countryForTranslation)}
                 />
                 <Pressable
                   style={styles.eyeIcon}
@@ -288,7 +310,7 @@ export default function AccountScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Confirm Password</Text>
+              <Text style={styles.label}>{getTranslation('signup.confirmpassword', language, countryForTranslation)}</Text>
               <View style={styles.passwordInputContainer}>
                 <TextInput
                   style={styles.passwordInput}
@@ -296,7 +318,7 @@ export default function AccountScreen() {
                   onChangeText={setConfirmPassword}
                   secureTextEntry={!showConfirmPassword}
                   placeholderTextColor="#666666"
-                  placeholder="Confirm new password"
+                  placeholder={getTranslation('signup.confirmpassword', language, countryForTranslation)}
                 />
                 <Pressable
                   style={styles.eyeIcon}
@@ -316,7 +338,7 @@ export default function AccountScreen() {
               onPress={handleChangePassword}
               disabled={isLoading}
             >
-              <Text style={styles.saveButtonText}>{isLoading ? 'Updating...' : 'Update Password'}</Text>
+              <Text style={styles.saveButtonText}>{isLoading ? getTranslation('profile.updating', language, countryForTranslation) : getTranslation('account.changepassword', language, countryForTranslation)}</Text>
             </Pressable>
           </View>
         )}
@@ -325,27 +347,27 @@ export default function AccountScreen() {
       {/* Admin Section */}
       {user?.isAdmin && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Admin Panel</Text>
+          <Text style={styles.sectionTitle}>{getTranslation('account.help', language, countryForTranslation)}</Text>
           <Pressable
             style={styles.adminButton}
             onPress={() => router.push('/upload-designs')}
           >
             <Ionicons name="cloud-upload" size={20} color="#FFFFFF" />
-            <Text style={styles.adminButtonText}>Upload Designs</Text>
+            <Text style={styles.adminButtonText}>{getTranslation('upload.title', language, countryForTranslation)}</Text>
           </Pressable>
           <Pressable
             style={styles.adminButton}
             onPress={() => router.push('/manage-designs')}
           >
             <Ionicons name="list" size={20} color="#FFFFFF" />
-            <Text style={styles.adminButtonText}>Manage Designs</Text>
+            <Text style={styles.adminButtonText}>{getTranslation('manage.title', language, countryForTranslation)}</Text>
           </Pressable>
           <Pressable
             style={styles.adminButton}
             onPress={() => router.push('/manage-featured')}
           >
             <Ionicons name="star" size={20} color="#FFB800" />
-            <Text style={styles.adminButtonText}>Manage Featured</Text>
+            <Text style={styles.adminButtonText}>{getTranslation('featured.title', language, countryForTranslation)}</Text>
           </Pressable>
         </View>
       )}
@@ -354,7 +376,7 @@ export default function AccountScreen() {
       <View style={styles.section}>
         <Pressable style={styles.logoutButton} onPress={handleLogout}>
           <Ionicons name="log-out" size={20} color="#FF6B6B" />
-          <Text style={styles.logoutButtonText}>Logout</Text>
+          <Text style={styles.logoutButtonText}>{getTranslation('account.logout', language, countryForTranslation)}</Text>
         </Pressable>
       </View>
 
@@ -574,3 +596,4 @@ const styles = StyleSheet.create({
     height: 20,
   },
 });
+

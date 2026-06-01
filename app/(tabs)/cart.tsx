@@ -2,7 +2,6 @@ import { useCartStore } from '@/store/cartStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { formatPrice } from '@/utils/currency';
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
 import { Alert, FlatList, Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 
 export default function CartScreen() {
@@ -11,7 +10,6 @@ export default function CartScreen() {
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const getTotal = useCartStore((state) => state.getTotal);
   const { country } = useLanguageStore();
-  const [orderSent, setOrderSent] = useState(false);
 
   const handleContactAdmin = async () => {
     if (items.length === 0) {
@@ -20,58 +18,57 @@ export default function CartScreen() {
     }
 
     try {
-      // Create order summary with design ID only (no local file paths)
-      const itemsList = items
-        .map((item) => `${item.name} (ID: ${item.id}) x${item.quantity}`)
-        .join('\n');
-      const total = getTotal();
-      const totalFormatted = formatPrice(total, country);
-      const message = `Hi, I'd like to order these designs:\n\n${itemsList}\n\nTotal: ${totalFormatted}`;
+      // Create order summary based on number of items
+      let message = '';
       
-      // Open WhatsApp with message
-      const whatsappUrl = `https://wa.me/2348117977661?text=${encodeURIComponent(message)}`;
-      
-      const canOpen = await Linking.canOpenURL(whatsappUrl);
-      if (canOpen) {
-        await Linking.openURL(whatsappUrl);
-        setOrderSent(true);
+      if (items.length === 1) {
+        // Single item: show image URL and price
+        const item = items[0];
+        const itemPrice = formatPrice((item.price || 0) * item.quantity, country);
+        message = `Hi, I'd like to order these designs:\n${item.image}\nPrice: ${itemPrice}`;
       } else {
-        Alert.alert('Error', 'WhatsApp is not installed on your device');
+        // Multiple items: show all images and total
+        const imageUrls = items.map((item) => item.image).join('\n');
+        const total = getTotal();
+        const totalFormatted = formatPrice(total, country);
+        message = `Hi, I'd like to order these designs:\n${imageUrls}\n\nTotal: ${totalFormatted}`;
       }
-    } catch (error) {
-      Alert.alert('Error', 'Could not open WhatsApp');
-    }
-  };
-
-  const handleShareImages = async () => {
-    try {
-      if (items.length === 0) {
-        Alert.alert('No Items', 'No products to share');
-        return;
-      }
-
-      // Create product list message
-      const productList = items
-        .map((item, index) => `${index + 1}. ${item.name} (ID: ${item.id}) - x${item.quantity}`)
-        .join('\n');
-
-      const message = `Here are the product images for my order:\n\n${productList}\n\nPlease check the images I'm about to share.`;
-
-      // Open WhatsApp with the message
-      const whatsappUrl = `https://wa.me/2348117977661?text=${encodeURIComponent(message)}`;
       
-      const canOpen = await Linking.canOpenURL(whatsappUrl);
-      if (canOpen) {
-        await Linking.openURL(whatsappUrl);
-        
-        // Show instruction alert
-        Alert.alert(
-          'Share Images',
-          'After opening WhatsApp:\n\n1. Tap the attachment button (+)\n2. Select "Photos & Videos"\n3. Choose the product images from your gallery\n\nThe images are saved in your device gallery.',
-          [{ text: 'OK' }]
-        );
+      // For Android, try multiple URL schemes
+      const phoneNumber = '2348117977661';
+      const encodedMessage = encodeURIComponent(message);
+      
+      // Different URL schemes to try
+      const urlSchemes = [
+        // Android: Try the standard whatsapp scheme first
+        `whatsapp://send?phone=${phoneNumber}&text=${encodedMessage}`,
+        // Android: Try without phone parameter (some Android versions)
+        `whatsapp://send?text=${encodedMessage}`,
+        // Web fallback
+        `https://wa.me/${phoneNumber}?text=${encodedMessage}`,
+      ];
+      
+      let opened = false;
+      
+      // Try each URL scheme
+      for (const url of urlSchemes) {
+        try {
+          const canOpen = await Linking.canOpenURL(url);
+          if (canOpen) {
+            await Linking.openURL(url);
+            opened = true;
+            break;
+          }
+        } catch (error) {
+          // Continue to next URL scheme
+          continue;
+        }
+      }
+      
+      if (opened) {
+        Alert.alert('Success', 'Opening WhatsApp...');
       } else {
-        Alert.alert('Error', 'WhatsApp is not installed on your device');
+        Alert.alert('Error', 'WhatsApp is not installed on your device. Please install WhatsApp to place orders.');
       }
     } catch (error) {
       Alert.alert('Error', 'Could not open WhatsApp');
@@ -158,16 +155,6 @@ export default function CartScreen() {
           <Ionicons name="logo-whatsapp" size={20} color="#000000" />
           <Text style={styles.contactButtonText}>Send Order</Text>
         </Pressable>
-
-        {orderSent && (
-          <Pressable
-            style={styles.shareButton}
-            onPress={handleShareImages}
-          >
-            <Ionicons name="image" size={20} color="#FFFFFF" />
-            <Text style={styles.shareButtonText}>Share Product Images</Text>
-          </Pressable>
-        )}
       </View>
     </View>
   );

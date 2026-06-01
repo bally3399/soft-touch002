@@ -158,6 +158,17 @@ export const changePassword = async (newPassword: string): Promise<void> => {
   }
 };
 
+// Reset password
+export const resetPassword = async (email: string): Promise<void> => {
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+
+    if (error) throw error;
+  } catch (error: any) {
+    throw new Error(error.message || 'Failed to send reset email');
+  }
+};
+
 // Check if user is admin
 export const isUserAdmin = (email: string): boolean => {
   return adminEmails.includes(email);

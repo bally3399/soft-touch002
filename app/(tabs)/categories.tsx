@@ -13,7 +13,6 @@ const CATEGORIES = [
   { id: 'agbada', name: 'Agbada', icon: 'shirt' },
   { id: 'english', name: 'English wears', icon: 'shirt' },
   { id: 'native', name: 'Nativewear', icon: 'shirt' },
-  { id: 'tshirt', name: 'T-shirt', icon: 'shirt' },
   { id: 'kaftan', name: 'Kaftan', icon: 'shirt' },
   { id: 'cap', name: 'Cap', icon: 'shirt' },
   { id: 'senate', name: 'Senate wear', icon: 'shirt' },

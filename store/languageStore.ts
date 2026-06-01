@@ -10,7 +10,88 @@ export interface LanguageState {
 
 // Country-specific languages
 export const COUNTRY_LANGUAGES: Record<string, Array<{ code: Language; name: string; nativeName: string }>> = {
-  // African countries with specific languages
+  // Completed countries with translations
+  Afghanistan: [
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'ps', name: 'Pashto', nativeName: 'پشتو' },
+  ],
+  Albania: [
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'el', name: 'Greek', nativeName: 'Ελληνικά' },
+  ],
+  Algeria: [
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'ar', name: 'Arabic', nativeName: 'العربية' },
+    { code: 'fr', name: 'French', nativeName: 'Français' },
+  ],
+  Andorra: [
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'es', name: 'Spanish', nativeName: 'Español' },
+    { code: 'fr', name: 'French', nativeName: 'Français' },
+  ],
+  Angola: [
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'pt', name: 'Portuguese', nativeName: 'Português' },
+  ],
+  'Antigua and Barbuda': [
+    { code: 'en', name: 'English', nativeName: 'English' },
+  ],
+  Argentina: [
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'es', name: 'Spanish', nativeName: 'Español' },
+  ],
+  Armenia: [
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'ru', name: 'Russian', nativeName: 'Русский' },
+  ],
+  Bahamas: [
+    { code: 'en', name: 'English', nativeName: 'English' },
+  ],
+  Bahrain: [
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'ar', name: 'Arabic', nativeName: 'العربية' },
+  ],
+  Bangladesh: [
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'bn', name: 'Bengali', nativeName: 'বাংলা' },
+  ],
+  Barbados: [
+    { code: 'en', name: 'English', nativeName: 'English' },
+  ],
+  Belarus: [
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'ru', name: 'Russian', nativeName: 'Русский' },
+  ],
+  Belgium: [
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'nl', name: 'Dutch', nativeName: 'Nederlands' },
+    { code: 'de', name: 'German', nativeName: 'Deutsch' },
+    { code: 'fr', name: 'French', nativeName: 'Français' },
+  ],
+  Belize: [
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'es', name: 'Spanish', nativeName: 'Español' },
+  ],
+  Benin: [
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'fr', name: 'French', nativeName: 'Français' },
+    { code: 'yo', name: 'Yoruba', nativeName: 'Yorùbá' },
+    { code: 'ha', name: 'Hausa', nativeName: 'Hausa' },
+  ],
+  Bhutan: [
+    { code: 'en', name: 'English', nativeName: 'English' },
+  ],
+  Bolivia: [
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'es', name: 'Spanish', nativeName: 'Español' },
+    { code: 'qu', name: 'Quechua', nativeName: 'Quechua' },
+    { code: 'ay', name: 'Aymara', nativeName: 'Aymara' },
+  ],
+  Brazil: [
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'pt', name: 'Portuguese', nativeName: 'Português' },
+    { code: 'es', name: 'Spanish', nativeName: 'Español' },
+  ],
   Nigeria: [
     { code: 'en', name: 'English', nativeName: 'English' },
     { code: 'ha', name: 'Hausa', nativeName: 'Hausa' },
@@ -19,60 +100,12 @@ export const COUNTRY_LANGUAGES: Record<string, Array<{ code: Language; name: str
   ],
   Ghana: [
     { code: 'en', name: 'English', nativeName: 'English' },
-    { code: 'ha', name: 'Twi', nativeName: 'Twi' },
   ],
   Kenya: [
     { code: 'en', name: 'English', nativeName: 'English' },
-    { code: 'ha', name: 'Swahili', nativeName: 'Kiswahili' },
   ],
   'South Africa': [
     { code: 'en', name: 'English', nativeName: 'English' },
-    { code: 'ha', name: 'Zulu', nativeName: 'isiZulu' },
-    { code: 'yo', name: 'Xhosa', nativeName: 'isiXhosa' },
-  ],
-  Egypt: [
-    { code: 'en', name: 'English', nativeName: 'English' },
-    { code: 'ha', name: 'Arabic', nativeName: 'العربية' },
-  ],
-  Uganda: [
-    { code: 'en', name: 'English', nativeName: 'English' },
-    { code: 'ha', name: 'Luganda', nativeName: 'Luganda' },
-  ],
-  Tanzania: [
-    { code: 'en', name: 'English', nativeName: 'English' },
-    { code: 'ha', name: 'Swahili', nativeName: 'Kiswahili' },
-  ],
-  Ethiopia: [
-    { code: 'en', name: 'English', nativeName: 'English' },
-    { code: 'ha', name: 'Amharic', nativeName: 'አማርኛ' },
-  ],
-  Cameroon: [
-    { code: 'en', name: 'English', nativeName: 'English' },
-    { code: 'ha', name: 'French', nativeName: 'Français' },
-  ],
-  Senegal: [
-    { code: 'en', name: 'English', nativeName: 'English' },
-    { code: 'ha', name: 'French', nativeName: 'Français' },
-  ],
-  'Ivory Coast': [
-    { code: 'en', name: 'English', nativeName: 'English' },
-    { code: 'ha', name: 'French', nativeName: 'Français' },
-  ],
-  Morocco: [
-    { code: 'en', name: 'English', nativeName: 'English' },
-    { code: 'ha', name: 'Arabic', nativeName: 'العربية' },
-  ],
-  Algeria: [
-    { code: 'en', name: 'English', nativeName: 'English' },
-    { code: 'ha', name: 'Arabic', nativeName: 'العربية' },
-  ],
-  Sudan: [
-    { code: 'en', name: 'English', nativeName: 'English' },
-    { code: 'ha', name: 'Arabic', nativeName: 'العربية' },
-  ],
-  Rwanda: [
-    { code: 'en', name: 'English', nativeName: 'English' },
-    { code: 'ha', name: 'Kinyarwanda', nativeName: 'Kinyarwanda' },
   ],
   // Default for all other countries
   default: [{ code: 'en', name: 'English', nativeName: 'English' }],

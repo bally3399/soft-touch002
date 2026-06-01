@@ -85,6 +85,7 @@ function RootLayoutNav() {
             <Stack.Screen name="manage-designs" />
             <Stack.Screen name="manage-featured" />
             <Stack.Screen name="product-details" />
+            <Stack.Screen name="reset-password" />
           </>
         ) : (
           <>
@@ -93,6 +94,7 @@ function RootLayoutNav() {
             <Stack.Screen name="language-select" />
             <Stack.Screen name="login" />
             <Stack.Screen name="signup" />
+            <Stack.Screen name="reset-password" />
           </>
         )}
       </Stack>

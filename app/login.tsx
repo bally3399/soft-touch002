@@ -5,7 +5,7 @@ import { useLanguageStore } from '@/store/languageStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Keyboard, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -15,6 +15,32 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+
+  const handleForgotPassword = async () => {
+    if (!resetEmail.trim()) {
+      Alert.alert('Error', 'Please enter your email address');
+      return;
+    }
+
+    if (!resetEmail.includes('@')) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return;
+    }
+
+    // Open WhatsApp with pre-filled message
+    const message = `Hi, I forgot my password. My email is: ${resetEmail}`;
+    const whatsappUrl = `https://wa.me/2348105795528?text=${encodeURIComponent(message)}`;
+    
+    try {
+      await Linking.openURL(whatsappUrl);
+      setShowForgotPasswordModal(false);
+      setResetEmail('');
+    } catch (error) {
+      Alert.alert('Error', 'Could not open WhatsApp. Please make sure WhatsApp is installed.');
+    }
+  };
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -140,6 +166,13 @@ export default function LoginScreen() {
           </View>
 
           <Pressable
+            style={styles.forgotPasswordLink}
+            onPress={() => setShowForgotPasswordModal(true)}
+          >
+            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+          </Pressable>
+
+          <Pressable
             style={[styles.button, loading && styles.buttonDisabled]}
             onPress={handleLogin}
             disabled={loading}
@@ -160,6 +193,60 @@ export default function LoginScreen() {
 
       {/* Extra padding at bottom to allow scrolling above keyboard */}
       <View style={styles.bottomPadding} />
+
+      {/* Forgot Password Modal */}
+      <Modal
+        visible={showForgotPasswordModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowForgotPasswordModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Reset Password</Text>
+              <Pressable
+                onPress={() => setShowForgotPasswordModal(false)}
+                style={styles.modalCloseButton}
+              >
+                <Ionicons name="close" size={24} color="#FFFFFF" />
+              </Pressable>
+            </View>
+
+            <Text style={styles.modalDescription}>
+              Enter your email address and we'll help you reset your password via WhatsApp.
+            </Text>
+
+            <View style={styles.modalInputGroup}>
+              <Text style={styles.label}>Email Address</Text>
+              <TextInput
+                style={styles.modalInput}
+                placeholder="Enter your email"
+                placeholderTextColor="#666666"
+                value={resetEmail}
+                onChangeText={setResetEmail}
+                keyboardType="email-address"
+              />
+            </View>
+
+            <Pressable
+              style={styles.modalButton}
+              onPress={handleForgotPassword}
+            >
+              <Text style={styles.modalButtonText}>
+                Contact Admin on WhatsApp
+              </Text>
+            </Pressable>
+
+            <Pressable
+              style={styles.modalCancelButton}
+              onPress={() => setShowForgotPasswordModal(false)}
+            >
+              <Text style={styles.modalCancelButtonText}>Cancel</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -277,5 +364,89 @@ const styles = StyleSheet.create({
   },
   bottomPadding: {
     height: 300,
+  },
+  forgotPasswordLink: {
+    alignSelf: 'flex-start',
+    marginTop: 8,
+    marginBottom: 20,
+  },
+  forgotPasswordText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  modalContent: {
+    backgroundColor: '#1A1A1A',
+    borderRadius: 12,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#333333',
+    width: '100%',
+    maxWidth: 400,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  modalCloseButton: {
+    padding: 8,
+  },
+  modalDescription: {
+    fontSize: 14,
+    color: '#AAAAAA',
+    marginBottom: 20,
+    lineHeight: 20,
+  },
+  modalInputGroup: {
+    marginBottom: 16,
+  },
+  modalInput: {
+    backgroundColor: '#2A2A2A',
+    borderWidth: 1,
+    borderColor: '#333333',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    color: '#FFFFFF',
+    fontSize: 14,
+  },
+  modalButton: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  modalButtonText: {
+    color: '#000000',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  modalCancelButton: {
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#333333',
+  },
+  modalCancelButtonText: {
+    color: '#AAAAAA',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
